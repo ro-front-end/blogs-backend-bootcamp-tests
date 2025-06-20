@@ -1,0 +1,12 @@
+Get http://localhost:3001/api/blogs/
+
+###
+POST http://localhost:3001/api/blogs/ HTTP/1.1
+content-type: application/json
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlJvY2siLCJpZCI6IjY3ZmQ1YWFkZGY3OTYwMGVmZWIxNGE1MSIsImlhdCI6MTc0NDY2Mjk1OCwiZXhwIjoxNzQ0NjY2NTU4fQ.ULSTlfO-tTps0tqZzAonplAMxSxMnOSubL2zr6qED-c
+
+{
+    "title": "sample of a third blog",
+    "author":"Rodrigo Arellano",
+    "url": "www.third.com"
+}
