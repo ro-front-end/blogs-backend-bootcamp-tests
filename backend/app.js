@@ -29,8 +29,11 @@ app.use(
       "https://techy-blogs-fullstack.onrender.com",
     ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use("/uploads", express.static("uploads"));
 app.use(middleware.requestLogger);
 
