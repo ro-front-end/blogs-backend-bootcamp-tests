@@ -6,6 +6,7 @@ const logger = require("../utils/logger");
 const jwt = require("jsonwebtoken");
 const { userExtractor } = require("../utils/middleware");
 const multer = require("multer");
+const supabase = require("../supabase");
 
 // const getTokenFrom = (request) => {
 //   const authorization = request.get("authorization");
@@ -14,6 +15,8 @@ const multer = require("multer");
 //   }
 //   return null;
 // };
+
+const multerMemory = multer();
 
 const storage = multer.diskStorage({
   destination: function (request, file, cb) {
@@ -59,9 +62,8 @@ blogRouter.get("/:id", async (request, response) => {
 blogRouter.post(
   "/",
   userExtractor,
-  uploads.single("file"),
+  multerMemory.single("file"), // usar multer en memoria para obtener buffer
   async (request, response) => {
-    console.log("request body:", request.body);
     const { title, author, url, likes, content } = request.body;
 
     if (!title || !author || !content) {
@@ -71,24 +73,49 @@ blogRouter.post(
     }
 
     const user = request.user;
-
-    const imageUrl = request.file
-      ? `${request.protocol}://${request.get("host")}/uploads/${
-          request.file.filename
-        }`
-      : undefined;
-
-    const blog = new Blog({
-      title,
-      author,
-      content,
-      url,
-      imageUrl,
-      likes: likes || 0,
-      user: user._id,
-    });
+    let imageUrl;
 
     try {
+      if (request.file) {
+        // subir imagen a supabase
+        const fileName = `images/${Date.now()}_${request.file.originalname}`;
+        const { data, error } = await supabase.storage
+          .from("estetechy-blogs-bucket")
+          .upload(fileName, request.file.buffer, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: request.file.mimetype,
+          });
+
+        if (error) {
+          return response.status(500).json({ error: "Error uploading image" });
+        }
+
+        // obtener url pública
+        const { publicUrl, error: urlError } = supabase.storage
+          .from("estetechy-blogs-bucket")
+          .getPublicUrl(fileName);
+
+        if (urlError) {
+          return response
+            .status(500)
+            .json({ error: "Error getting public URL" });
+        }
+
+        imageUrl = publicUrl;
+      }
+
+      // crear blog con imageUrl de supabase
+      const blog = new Blog({
+        title,
+        author,
+        content,
+        url,
+        imageUrl,
+        likes: likes || 0,
+        user: user._id,
+      });
+
       const savedBlog = await blog.save();
       user.blogs = user.blogs.concat(savedBlog._id);
       await user.save();
@@ -101,30 +128,45 @@ blogRouter.post(
   }
 );
 
-blogRouter.post("/upload", uploads.single("image"), (request, response) => {
+blogRouter.post("/upload", multerMemory.single("file"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
   try {
-    if (!request.file) {
-      return response.status(400).json({ error: "No file uploaded" });
-    }
+    const { data, error } = await supabase.storage
+      .from("estetechy-blogs-bucket") // nombre del bucket
+      .upload(
+        `images/${Date.now()}_${req.file.originalname}`,
+        req.file.buffer,
+        {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: req.file.mimetype,
+        }
+      );
 
-    const fullUrl = `${request.protocol}://${request.get("host")}/uploads/${
-      request.file.filename
-    }`;
+    if (error) throw error;
 
-    response.status(200).json({
-      message: "File uploaded succesfully",
-      imageUrl: fullUrl,
+    // Obtener la URL pública (si el bucket es público)
+    const publicUrl = supabase.storage
+      .from("estetechy-blogs-bucket")
+      .getPublicUrl(data.path);
+
+    res.status(200).json({
+      message: "File uploaded successfully",
+      imageUrl: publicUrl.data.publicUrl,
     });
   } catch (error) {
-    console.error(error.message);
-    response.status(500).json({ error: "error uploading file" });
+    console.error(error);
+    res.status(500).json({ error: "Error uploading file" });
   }
 });
 
 blogRouter.put(
   "/:id",
   userExtractor,
-  uploads.single("file"),
+  multerMemory.single("file"),
   async (request, response) => {
     const { title, author, url, likes, content } = request.body;
 
@@ -137,9 +179,32 @@ blogRouter.put(
     };
 
     if (request.file) {
-      updatedBlog.imageUrl = `${request.protocol}://${request.get(
-        "host"
-      )}/uploads/${request.file.filename}`;
+      try {
+        const { data, error } = await supabase.storage
+          .from("estetechy-blogs-bucket")
+          .upload(
+            `images/${Date.now()}_${request.file.originalname}`,
+            request.file.buffer,
+            {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: request.file.mimetype,
+            }
+          );
+
+        if (error) throw error;
+
+        const { publicUrl, error: urlError } = supabase.storage
+          .from("estetechy-blogs-bucket")
+          .getPublicUrl(data.path);
+
+        if (urlError) throw urlError;
+
+        updatedBlog.imageUrl = publicUrl;
+      } catch (uploadError) {
+        console.error("Error uploading image:", uploadError);
+        return response.status(500).json({ error: "Error uploading image" });
+      }
     }
 
     try {
