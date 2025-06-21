@@ -73,7 +73,7 @@ function BlogList() {
                 className="absolute object-cover rounded-t-xl"
                 src={blog.imageUrl || "/ads-future.png"}
                 alt={blog.title}
-                quality={30}
+                quality={20}
               />
             </div>
             <div className="p-4 border-b border-cyan-800 bg-black bg-opacity-50 rounded-t-2xl">

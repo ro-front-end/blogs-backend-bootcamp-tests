@@ -17,12 +17,12 @@ function Hero() {
         <h1 className="text-4xl md:text-6xl bg-black p-6 bg-opacity-90 rounded-2xl font-bold text-white mb-6 uppercase">
           TECHY-BLOG
         </h1>
-        <p className="text-lg md:text-xl text-gray-200 mb-8">
-          Everything about the tech world!
+        <p className="font-semibold text-lg md:text-xl text-gray-200 mb-8">
+          Everything to know about the tech world!
         </p>
         <Link
           href="/blogs"
-          className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-xl transition duration-300 ease-in-out shadow-lg hover:shadow-xl"
+          className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold p-4 rounded-xl transition duration-300 ease-in-out shadow-lg hover:shadow-xl w-full"
           aria-label="Go to blogs"
         >
           Enter Techy-Blog

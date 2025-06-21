@@ -83,7 +83,7 @@ function LoginForm() {
             type="submit"
             id="login-button"
           >
-            {loading ? "logging in" : "Login"}
+            {loading ? "logging in..." : "Login"}
           </button>
           <button
             onClick={() => router.push("/")}

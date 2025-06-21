@@ -30,7 +30,7 @@ export const createBlog = async (token, values) => {
     const response = await axios.post(`${BLOGS}`, values, config);
     return response.data;
   } catch (error) {
-    console.error("Error creating blog");
+    console.error("Error creating blog", error.response?.data || error.message);
     throw error;
   }
 };

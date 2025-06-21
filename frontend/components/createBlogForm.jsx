@@ -41,30 +41,29 @@ export default function CreateBlogForm({
         return;
       }
 
-      let imageUrl;
-
-      const file = values.file;
-
-      if (file) {
+      let imageUrl = null;
+      if (values.file) {
         try {
-          const uploadForm = new FormData();
-          uploadForm.append("file", file);
+          const fileName = `images/${Date.now()}_${values.file.name}`;
+          const { data, error } = await supabase.storage
+            .from("techy-blogs-bucket")
+            .upload(fileName, values.file, {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: values.file.type,
+            });
 
-          const uploadRes = await axios.post(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/blogs/upload`,
-            uploadForm,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          if (error) throw error;
 
-          imageUrl = uploadRes.data.imageUrl;
-        } catch (err) {
-          console.error("Image upload failed:", err.message);
-          alert("Image upload failed.");
+          const { publicUrl, error: urlError } = supabase.storage
+            .from("techy-blogs-bucket")
+            .getPublicUrl(fileName);
+
+          if (urlError) throw urlError;
+
+          imageUrl = publicUrl;
+        } catch (error) {
+          alert("Error uploading image");
           return;
         }
       }
@@ -73,18 +72,18 @@ export default function CreateBlogForm({
         title: values.title,
         author: values.author,
         content: values.content,
-        imageUrl: imageUrl || "", // si no hay imagen, campo vacío
+        imageUrl,
       };
 
       if (isEdit && onSubmitCallBack) {
         await onSubmitCallBack(blogData);
       } else {
-        dispatch(createBlogThunk({ token, formData: blogData }));
+        dispatch(createBlogThunk({ token, blogData }));
         resetForm();
       }
 
-      if (file) {
-        setPreview(URL.createObjectURL(file));
+      if (values.file) {
+        setPreview(URL.createObjectURL(values.file));
       }
 
       handleCloseForm();
@@ -197,9 +196,9 @@ export default function CreateBlogForm({
           <button
             type="submit"
             className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-xl w-full transition duration-300"
-            disabled={loading}
+            disabled={!token || loading}
           >
-            {isEdit
+            {!isEdit
               ? loading
                 ? "Editing..."
                 : "Edit Post"
