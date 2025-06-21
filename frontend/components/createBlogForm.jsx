@@ -41,20 +41,45 @@ export default function CreateBlogForm({
         return;
       }
 
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("author", values.author);
-      formData.append("content", values.content);
+      let imageUrl;
 
       const file = values.file;
+
       if (file) {
-        formData.append("file", file);
+        try {
+          const uploadForm = new FormData();
+          uploadForm.append("file", file);
+
+          const uploadRes = await axios.post(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/blogs/upload`,
+            uploadForm,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          imageUrl = uploadRes.data.imageUrl;
+        } catch (err) {
+          console.error("Image upload failed:", err.message);
+          alert("Image upload failed.");
+          return;
+        }
       }
 
+      const blogData = {
+        title: values.title,
+        author: values.author,
+        content: values.content,
+        imageUrl: imageUrl || "", // si no hay imagen, campo vacío
+      };
+
       if (isEdit && onSubmitCallBack) {
-        await onSubmitCallBack(formData);
+        await onSubmitCallBack(blogData);
       } else {
-        dispatch(createBlogThunk({ token, formData }));
+        dispatch(createBlogThunk({ token, formData: blogData }));
         resetForm();
       }
 
