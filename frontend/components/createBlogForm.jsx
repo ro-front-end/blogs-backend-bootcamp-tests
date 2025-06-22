@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useAuthHook } from "@/hooks/setAuthHook";
 import Image from "next/image";
 import { useState } from "react";
+import { supabase } from "@/supabase";
 
 export default function CreateBlogForm({
   initialData = null,
@@ -55,7 +56,10 @@ export default function CreateBlogForm({
 
           if (error) throw error;
 
-          const { publicUrl, error: urlError } = supabase.storage
+          const {
+            data: { publicUrl },
+            error: urlError,
+          } = supabase.storage
             .from("techy-blogs-bucket")
             .getPublicUrl(fileName);
 
@@ -72,6 +76,7 @@ export default function CreateBlogForm({
         title: values.title,
         author: values.author,
         content: values.content,
+        likes: values.likes || 0,
         imageUrl,
       };
 
@@ -86,6 +91,7 @@ export default function CreateBlogForm({
         setPreview(URL.createObjectURL(values.file));
       }
 
+      setPreview(null);
       handleCloseForm();
     },
   });
@@ -101,7 +107,7 @@ export default function CreateBlogForm({
             <button
               type="button"
               onClick={() => handleOpenForm()}
-              className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-cyan-500 hover:to-cyan-400 transition duration-300"
+              className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white font-semibold py-4 px-8 rounded-xl hover:from-cyan-500 hover:to-cyan-400 transition duration-300"
             >
               Post Blog!
             </button>
@@ -195,7 +201,7 @@ export default function CreateBlogForm({
 
           <button
             type="submit"
-            className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-xl w-full transition duration-300"
+            className="bg-orange-600 hover:bg-orange-700 text-white font-semibold  rounded-xl w-full transition duration-300 p-4"
             disabled={!token || loading}
           >
             {!isEdit

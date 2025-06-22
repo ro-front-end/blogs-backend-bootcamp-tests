@@ -30,7 +30,7 @@ export default function AboutPage() {
             <h3 className="font-semibold text-cyan-300">Backend</h3>
             <p className="text-sm text-slate-400 mt-2">
               Powered by <strong>Express</strong>, <strong>Mongoose</strong>,{" "}
-              <strong>JWT</strong>, and <strong>Multer</strong> for secure,
+              <strong>JWT</strong>, and <strong>Supabase</strong> for secure,
               RESTful APIs, image uploads, and seamless integration with{" "}
               <strong>MongoDB</strong>.
             </p>

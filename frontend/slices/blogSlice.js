@@ -43,9 +43,9 @@ export const fetchBlogByIdThunk = createAsyncThunk(
 
 export const createBlogThunk = createAsyncThunk(
   "blogs/createBlog",
-  async ({ token, formData }, { rejectWithValue }) => {
+  async ({ token, blogData }, { rejectWithValue }) => {
     try {
-      const newBlog = await createBlog(token, formData);
+      const newBlog = await createBlog(token, blogData);
       return newBlog;
     } catch (error) {
       return rejectWithValue(

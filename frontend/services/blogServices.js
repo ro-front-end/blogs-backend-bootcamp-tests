@@ -22,7 +22,7 @@ export const createBlog = async (token, values) => {
     console.log("Values values:", values);
     const config = {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     };
@@ -38,6 +38,7 @@ export const createBlog = async (token, values) => {
 export const updateBlog = async (id, updatedBlog, token) => {
   const config = {
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   };

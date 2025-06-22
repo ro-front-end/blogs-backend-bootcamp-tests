@@ -11,6 +11,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "blogs-backend-bootcamp-tests.onrender.com",
       },
+      {
+        protocol: "https",
+        hostname: "hhspvoopjjmiuahjaueh.supabase.co",
+      },
     ],
   },
 };

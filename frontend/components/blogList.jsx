@@ -59,7 +59,7 @@ function BlogList() {
         </p>
       </div>
       <div
-        className="grid grid-cols-1 justify-center sm:grid-cols-2 xl:grid-cols-3 gap-6 p-6 mt-4
+        className="grid grid-cols-1 justify-center sm:grid-cols-2 xl:grid-cols-4 gap-6 p-6 mt-2
     "
       >
         {sortedBlogs.map((blog) => (
@@ -67,7 +67,7 @@ function BlogList() {
             key={blog.id}
             className="bg-gradient-to-br from-slate-900 to-cyan-900 text-white rounded-2xl shadow-lg flex flex-col justify-between w-full mx-auto"
           >
-            <div className="relative w-full h-[10rem] sm:h-52 ">
+            <div className="relative w-full h-[14rem] sm:h-[16rem] md:h-[18rem]">
               <Image
                 fill
                 className="absolute object-cover rounded-t-xl"

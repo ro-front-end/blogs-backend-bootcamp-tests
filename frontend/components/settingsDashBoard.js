@@ -6,30 +6,32 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { logout, setCredentials } from "@/slices/authSlice";
 import { useEffect, useState } from "react";
+import { useAuthHook } from "@/hooks/setAuthHook";
 
 function SettingsDashBoard() {
-  const [authChecked, setAuthChecked] = useState(false);
+  // const [authChecked, setAuthChecked] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const router = useRouter();
+  const authChecked = useAuthHook();
+
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     const storedUser = localStorage.getItem("user");
+  //     const storedToken = localStorage.getItem("token");
+
+  //     if (storedUser && storedToken) {
+  //       dispatch(
+  //         setCredentials({ user: JSON.parse(storedUser), token: storedToken })
+  //       );
+  //     }
+  //     setAuthChecked(true);
+  //   }
+  // }, [dispatch]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user");
-      const storedToken = localStorage.getItem("token");
-
-      if (storedUser && storedToken) {
-        dispatch(
-          setCredentials({ user: JSON.parse(storedUser), token: storedToken })
-        );
-      }
-      setAuthChecked(true);
-    }
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (authChecked && !user) {
-      router.push("/login");
+    if (!authChecked && !user) {
+      router.push("/");
     }
   }, [authChecked, user, router]);
 
@@ -52,7 +54,6 @@ function SettingsDashBoard() {
         </button>
       </div>
 
-      {/* Main content */}
       <div className="col-span-7 p-6">
         <BlogTabs />
       </div>
