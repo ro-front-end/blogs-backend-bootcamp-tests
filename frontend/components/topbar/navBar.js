@@ -40,25 +40,23 @@ function NavBar() {
     };
   }, [showMenu]);
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <nav className="flex justify-between items-center w-full mx-auto">
       <Logo handleCloseMenu={handleCloseMenu} />
       <div className="flex gap-6 justify-center">
-        <Link
-          id="settings-link"
-          onClick={handleCloseMenu}
-          href="/settings"
-          className="flex justify-end gap-2 items-center"
-        >
-          <FaUser className="bg-orange-500 text-xl p-1 rounded-full" />{" "}
-          <span className="text-cyan-400 hover:text-orange-400 transition duration-300">
-            {user.username}
-          </span>
-        </Link>
+        {!user ? null : (
+          <Link
+            id="settings-link"
+            onClick={handleCloseMenu}
+            href="/settings"
+            className="flex justify-end gap-2 items-center"
+          >
+            <FaUser className="bg-orange-500 text-xl p-1 rounded-full" />{" "}
+            <span className="text-cyan-400 hover:text-orange-400 transition duration-300">
+              {user.username}
+            </span>
+          </Link>
+        )}
         <BurgerMenu
           menuRef={menuRef}
           showMenu={showMenu}
