@@ -21,7 +21,6 @@ export function useAuthHook() {
 
         if (isExpired) {
           dispatch(logout());
-          router.push("/login");
         } else {
           dispatch(
             setCredentials({
@@ -32,7 +31,6 @@ export function useAuthHook() {
         }
       } else {
         dispatch(logout());
-        router.push("/login");
       }
       setLocalStorageChecked(true);
     }
