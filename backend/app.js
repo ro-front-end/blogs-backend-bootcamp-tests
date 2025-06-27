@@ -7,6 +7,7 @@ const loginRouter = require("./controllers/loginRoutes");
 const middleware = require("./utils/middleware");
 const logger = require("./utils/logger");
 const cors = require("cors");
+const pingRouter = require("./controllers/pingRoutes");
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use("/api/login", loginRouter);
 app.use("/api/users", usersRouter);
 
 // Public routes
+app.use("/api/ping", pingRouter);
 app.use("/api/blogs", blogsRouter);
 
 if (process.env.NODE_ENV === "test") {
